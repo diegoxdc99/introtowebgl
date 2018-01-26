@@ -3,17 +3,13 @@ var demo = (function(){
         light= new THREE.AmbientLight(0xffffff),        
         camera,
         renderer = new THREE.WebGLRenderer(),
-        box,
-        ground,
-        controls=null,
+        objectsElement,
         scalingSpeed = 0.03,
-        scalingStep = 0,
-        clock,
-        composer;
+        scalingStep = 0;
 
         function initScene(){
-            
-            renderer.setSize( 500, 500 );
+            objectsElement = new Array();
+            renderer.setSize( 150, 100 );
         
             document.getElementById("webgl-container").appendChild(renderer.domElement);
 
@@ -25,11 +21,24 @@ var demo = (function(){
                     1,
                     1000
                 );
+                object = new THREE.Object3D();
+				scene.add( object );
+                var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+                for ( var i = 0; i < 100; i ++ ) {
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), flatShading: true } );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+					mesh.position.multiplyScalar( Math.random() * 400 );
+					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50;
+                    object.add( mesh );
+                    objectsElement.push(mesh);
+				}
             
             camera.position.set( 0, 30, 150 );
             
             scene.add(camera);             
-            loadModel();
+            //loadModel();
             document.addEventListener('mousedown', onDocumentMouseDown, false);
             requestAnimationFrame(render);
             
@@ -40,7 +49,11 @@ var demo = (function(){
             var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
             projector.unprojectVector(vector, camera);
             var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-            var intersects = raycaster.intersectObjects(objects);
+            var intersects = raycaster.intersectObjects(objectsElement);
+            if (intersects.length > 0) {
+                resizeCubeAnimation(intersects[0].object);
+               // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+    }
     }
 
         function loadModel(){
@@ -72,7 +85,7 @@ var demo = (function(){
             cube.rotation.z += 0.04;
         }
 
-        function resizeCubeAnimation(cube){
+        function resizeObjectAnimation(cube){
             // let valueScale = cube.scale.x;
             // if (isDecrease){
             //     valueScale -= deltaScale;
