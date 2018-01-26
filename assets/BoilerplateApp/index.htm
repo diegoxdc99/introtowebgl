@@ -3,16 +3,28 @@
 <html>
 
     <head>
-        <title>Intro to WebGL with three.js</title>   
+        <style>
+            #webgl-container {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+            }
+        </style>
+        <title>Intro to WebGL with three.js</title> 
+        <script src="scripts/three.min.js"></script>        
+        <script src="scripts/CopyShader.js"></script>
+        <script src="scripts/DigitalGlitch.js"></script>
+        <script src="scripts/EffectComposer.js"></script>	
+        <script src="scripts/RenderPass.js"></script>			
+		<script src="scripts/MaskPass.js"></script>
+		<script src="scripts/ShaderPass.js"></script>
+		<script src="scripts/GlitchPass.js"></script>
+          
+        <script src="scripts/app.js"></script>
     </head>
 
     <body>
-
         <div id="webgl-container"></div>
-
-        <script src="scripts/three.js"></script>
-        <script src="scripts/app.js"></script>
-
     </body>
 
 </html>
