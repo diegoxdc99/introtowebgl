@@ -13,7 +13,7 @@ var demo = (function(){
 
         function initScene(){
             
-            renderer.setSize( 150, 100 );
+            renderer.setSize( 500, 500 );
         
             document.getElementById("webgl-container").appendChild(renderer.domElement);
 
@@ -26,51 +26,44 @@ var demo = (function(){
                     1000
                 );
             
-            camera.position.set( 0, 0, 100 );
+            camera.position.set( 0, 30, 150 );
             
-            scene.add(camera);  
-
-            box = new THREE.Mesh(
-              new THREE.CubeGeometry(
-                20,
-                20,
-                20),
-              new THREE.MeshBasicMaterial({color: 0xFF0000}));
-            
-            box.position.set(0,0,0);
-
-            var childBox = new THREE.Mesh(
-                new THREE.CubeGeometry(19, 19, 19),
-                new THREE.MeshBasicMaterial({color: 0x00FF00}));
-            
-            childBox.position.set(0,0,0);
-            childBox.rotation.x = 0.785398;
-
-            camera.lookAt(new THREE.Vector3(0,0,0));
-
-            box.add(childBox)
-            scene.add(box);          
-
-            composer = new THREE.EffectComposer( renderer );
-            composer.addPass( new THREE.RenderPass( scene, camera ) );
-
-            glitchPass = new THREE.GlitchPass();
-            glitchPass.renderToScreen = true;
-            composer.addPass( glitchPass );
-
+            scene.add(camera);             
+            loadModel();
+            document.addEventListener('mousedown', onDocumentMouseDown, false);
             requestAnimationFrame(render);
             
         };
+        function onDocumentMouseDown(event) {
+            event.preventDefault();
+            var projector = new THREE.Projector();
+            var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
+            projector.unprojectVector(vector, camera);
+            var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+            var intersects = raycaster.intersectObjects(objects);
+    }
+
+        function loadModel(){
+            var loader = new THREE.JSONLoader(),
+            mesh;
+    
+            loader.load('Models/gooseFull.js', function (geometry) {
+                  var gooseMaterial = new THREE.MeshLambertMaterial({
+                   map: THREE.ImageUtils.loadTexture('Texture/goose.jpg')
+               });
+    
+               mesh = new THREE.Mesh(geometry, gooseMaterial);
+               mesh.scale.set(50,50,50);
+               scene.add(mesh);
+            });
+        }
 
         function render() {
-               // renderer.render(scene, camera); 
+                renderer.render(scene, camera); 
                 //animateCamera();
-                rotateCube(box);
-                resizeCubeAnimation(box);                
+               //rotateCube(box);
+               // resizeCubeAnimation(box);                
                 requestAnimationFrame(render);
-                var time = Date.now();
-                composer.render();
-                
         };
 
         function rotateCube(cube){
